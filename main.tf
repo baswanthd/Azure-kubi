@@ -16,8 +16,8 @@ provider "azurerm" {
 
 
 resource "azurerm_resource_group" "devopsbas" {
-  name     = "devops_bas"
-  location = "West Europe"
+  name     = "devopsbas"
+  location = "var.location"
 }
 
 
@@ -32,7 +32,7 @@ resource "azurerm_virtual_network" "devopsavn" {
   location            = azurerm_resource_group.devopsbas.location
   resource_group_name = azurerm_resource_group.devopsbas.name
   address_space       = ["10.0.0.0/16"]
-  dns_servers         = ["10.0.0.4", "10.0.0.5"]
+  #dns_servers         = ["10.0.0.4", "10.0.0.5"]
 
   subnet {
     name           = "subnet1"
@@ -47,5 +47,45 @@ resource "azurerm_virtual_network" "devopsavn" {
 
   tags = {
     environment = "Production"
+  }
+}
+
+resource "azurerm_network_interface" "devopsni" {
+  name                = "devopsni"
+  location            = azurerm_resource_group.devopsbas.location
+  resource_group_name = azurerm_resource_group.devopsbas.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.subnet1.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_linux_virtual_machine" "devopsvm" {
+  name                = "devopsvm"
+  location            = azurerm_resource_group.devopsbas.location
+  resource_group_name = azurerm_resource_group.devopsbas.name
+  size                = var.vm_type
+  admin_username      = var.admin_username
+  network_interface_ids = [
+    azurerm_network_interface.devopsni.id,
+  ]
+
+  admin_ssh_key {
+    username   = var.admin_username
+    public_key = file("~/.ssh/id_rsa.pub")
+  }
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts"
+    version   = "latest"
   }
 }
