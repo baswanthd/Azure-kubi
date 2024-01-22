@@ -7,9 +7,9 @@ on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
 
-    branches: [ "baswanth-east-us" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "baswanth-east-us" ]
+    branches: [ "main" ]
 
 
   # Allows you to run this workflow manually from the Actions tab
