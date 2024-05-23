@@ -1,5 +1,5 @@
 resource "random_pet" "server" {
-    prefix = "ssh"
+  prefix = "ssh"
 }
 
 
@@ -22,12 +22,3 @@ resource "azapi_resource_action" "ssh_public_key_gen" {
 output "key_data" {
   value = jsondecode(azapi_resource_action.ssh_public_key_gen.output).publicKey
 }
-/*
-output "private" {
-  value =  jsondecode(azapi_resource_action.ssh_public_key_gen.output).privateKey
-}
-*/
-# resource "local_sensitive_file" "bas-sens-file" {
-#   content  =  jsondecode(azapi_resource_action.ssh_public_key_gen.output).privateKey
-#   filename = "azure-bas-key"
-# }
